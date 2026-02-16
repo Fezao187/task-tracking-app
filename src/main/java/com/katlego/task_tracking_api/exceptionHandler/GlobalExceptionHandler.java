@@ -1,6 +1,5 @@
 package com.katlego.task_tracking_api.exceptionHandler;
 
-import com.katlego.task_tracking_api.exception.EmailAlreadyExistsException;
 import com.katlego.task_tracking_api.exception.ResourceAlreadyExistException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

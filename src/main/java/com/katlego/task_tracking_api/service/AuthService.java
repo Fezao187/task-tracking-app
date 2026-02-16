@@ -4,8 +4,7 @@ import com.katlego.task_tracking_api.domain.Role;
 import com.katlego.task_tracking_api.domain.User;
 import com.katlego.task_tracking_api.dto.auth.AuthResponse;
 import com.katlego.task_tracking_api.dto.auth.SignupRequest;
-import com.katlego.task_tracking_api.exception.EmailAlreadyExistsException;
-import com.katlego.task_tracking_api.exception.UsernameAlreadyExistsException;
+import com.katlego.task_tracking_api.exception.ResourceAlreadyExistException;
 import com.katlego.task_tracking_api.mapper.AuthenticationMapper;
 import com.katlego.task_tracking_api.repository.RoleRepository;
 import com.katlego.task_tracking_api.repository.UserRepository;
@@ -36,11 +35,11 @@ public class AuthService {
 
     public AuthResponse signup(SignupRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new EmailAlreadyExistsException(request.getEmail());
+            throw new ResourceAlreadyExistException("Email already exists: "+request.getEmail());
         }
 
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new UsernameAlreadyExistsException(request.getUsername());
+            throw new ResourceAlreadyExistException("Username already exists: "+request.getUsername());
         }
 
         Role userRole = roleRepository.findByName("USER")

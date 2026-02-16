@@ -1,6 +1,7 @@
 package com.katlego.task_tracking_api.controller;
 
 import com.katlego.task_tracking_api.dto.auth.AuthResponse;
+import com.katlego.task_tracking_api.dto.auth.LoginRequest;
 import com.katlego.task_tracking_api.dto.auth.SignupRequest;
 import com.katlego.task_tracking_api.service.AuthService;
 import jakarta.validation.Valid;
@@ -24,5 +25,10 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<AuthResponse> signup(@Valid @RequestBody SignupRequest request) {
         return new ResponseEntity<>(authService.signup(request), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+        return new ResponseEntity<>(authService.login(request), HttpStatus.OK);
     }
 }

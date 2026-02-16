@@ -16,5 +16,11 @@ spring:
     baseline-on-migrate: true
     validate-on-migrate: true
     enabled: true
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    access-token-expiration-ms: 900000
+    refresh-token-expiration-ms: 604800000
+
 schedule:
   refresh-token-cleanup-schedule-time: "0 59 23 * * *"

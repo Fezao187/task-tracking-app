@@ -1,4 +1,4 @@
-package com.katlego.task_tracking_api.domain.security.entity;
+package com.katlego.task_tracking_api.security.entity;
 
 import com.katlego.task_tracking_api.domain.User;
 import org.jspecify.annotations.Nullable;

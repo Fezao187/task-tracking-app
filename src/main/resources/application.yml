@@ -16,3 +16,5 @@ spring:
     baseline-on-migrate: true
     validate-on-migrate: true
     enabled: true
+schedule:
+  refresh-token-cleanup-schedule-time: "0 59 23 * * *"

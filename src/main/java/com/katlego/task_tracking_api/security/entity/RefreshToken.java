@@ -30,4 +30,8 @@ public class RefreshToken {
 
     @Column(nullable = false)
     private Instant expiresAt;
+
+    public boolean isExpired() {
+        return Instant.now().isAfter(this.expiresAt);
+    }
 }

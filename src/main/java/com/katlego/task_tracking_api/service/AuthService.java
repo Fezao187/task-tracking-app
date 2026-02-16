@@ -59,16 +59,7 @@ public class AuthService {
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
 
-        String accessToken = jwtService.generateAccessToken(
-                user.getEmail(),
-                Map.of("username", user.getUsername(),
-                        "role", user.getRole().getName())
-        );
-
-        String refreshToken = jwtService.generateRefreshToken(user.getEmail());
-        refreshTokenService.saveRefreshToken(user.getEmail(), refreshToken);
-
-        return new AuthResponse(accessToken, refreshToken);
+        return generateTokens(user);
     }
 
     public AuthResponse login(LoginRequest request) {

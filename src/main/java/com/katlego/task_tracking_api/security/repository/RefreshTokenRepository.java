@@ -13,12 +13,9 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
 
     Optional<RefreshToken> findByEmailAndToken(String email, String token);
 
-    @Transactional
     void deleteByEmail(String email);
 
-    @Transactional
     void deleteByEmailAndToken(String email, String token);
 
-    @Transactional
     int deleteByExpiresAtBefore(Instant expirationTime);
 }

@@ -2,6 +2,7 @@ package com.katlego.task_tracking_api.security.service;
 
 import com.katlego.task_tracking_api.security.entity.RefreshToken;
 import com.katlego.task_tracking_api.security.repository.RefreshTokenRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ public class RefreshTokenService {
         this.refreshTokenExpirationMs = refreshTokenExpirationMs;
     }
 
+    @Transactional
     public void saveRefreshToken(String email, String token) {
         refreshTokenRepository.deleteByEmail(email);
 
@@ -41,11 +43,13 @@ public class RefreshTokenService {
         return refreshToken.isPresent() && !refreshToken.get().isExpired();
     }
 
+    @Transactional
     public void rotateRefreshToken(String email, String oldToken, String newToken) {
         refreshTokenRepository.deleteByEmailAndToken(email, oldToken);
         saveRefreshToken(email, newToken);
     }
 
+    @Transactional
     public void deleteRefreshToken(String email) {
         refreshTokenRepository.deleteByEmail(email);
     }

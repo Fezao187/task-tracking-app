@@ -9,7 +9,7 @@ import java.time.Instant;
 
 @Data
 public class CreateTaskRequest {
-    @NotBlank
+    @NotBlank(message = "Title is required!")
     @Size(max = 200)
     private String title;
     private String description;

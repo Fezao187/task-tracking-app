@@ -134,21 +134,4 @@ public class AuthService {
                 "role", user.getRole().getName()
         );
     }
-
-    public String getLoggedInUserEmail() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new IllegalStateException("No authenticated user found");
-        }
-
-        Object principal = authentication.getPrincipal();
-
-        if (principal instanceof UserDetails userDetails) {
-            log.info("Email "+userDetails.getUsername());
-            return userDetails.getUsername();
-        }
-
-        return principal.toString();
-    }
 }

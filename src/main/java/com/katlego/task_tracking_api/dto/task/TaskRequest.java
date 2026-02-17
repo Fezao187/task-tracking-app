@@ -8,7 +8,7 @@ import lombok.Data;
 import java.time.Instant;
 
 @Data
-public class CreateTaskRequest {
+public class TaskRequest {
     @NotBlank(message = "Title is required!")
     @Size(max = 200)
     private String title;

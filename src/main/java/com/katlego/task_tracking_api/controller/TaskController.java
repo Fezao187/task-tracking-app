@@ -1,6 +1,6 @@
 package com.katlego.task_tracking_api.controller;
 
-import com.katlego.task_tracking_api.dto.task.CreateTaskRequest;
+import com.katlego.task_tracking_api.dto.task.TaskRequest;
 import com.katlego.task_tracking_api.dto.task.TaskResponse;
 import com.katlego.task_tracking_api.service.TaskService;
 import org.springframework.http.HttpStatus;
@@ -22,7 +22,7 @@ public class TaskController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
-    public ResponseEntity<TaskResponse> createTask(@RequestBody CreateTaskRequest request){
+    public ResponseEntity<TaskResponse> createTask(@RequestBody TaskRequest request){
         return new ResponseEntity<>(taskService.createTask(request), HttpStatus.CREATED);
     }
 }

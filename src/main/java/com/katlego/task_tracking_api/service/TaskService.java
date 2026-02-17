@@ -2,7 +2,7 @@ package com.katlego.task_tracking_api.service;
 
 import com.katlego.task_tracking_api.common.AuthenticatedUserComponent;
 import com.katlego.task_tracking_api.domain.Task;
-import com.katlego.task_tracking_api.dto.task.CreateTaskRequest;
+import com.katlego.task_tracking_api.dto.task.TaskRequest;
 import com.katlego.task_tracking_api.dto.task.TaskResponse;
 import com.katlego.task_tracking_api.mapper.TaskMapper;
 import com.katlego.task_tracking_api.repository.TaskRepository;
@@ -23,7 +23,7 @@ public class TaskService {
         this.taskMapper = taskMapper;
     }
 
-    public TaskResponse createTask(CreateTaskRequest request){
+    public TaskResponse createTask(TaskRequest request){
         if(!authenticatedUserComponent.isAdmin()){
             throw new AccessDeniedException("Only admins can create users");
         }
@@ -31,5 +31,15 @@ public class TaskService {
         Task newTask = taskMapper.toTaskFromRequest(request);
 
         return taskMapper.toTaskResponseFromModel(newTask);
+    }
+
+    public TaskResponse updateTask(Long taskId, TaskRequest request){
+        if(!authenticatedUserComponent.isAdmin()){
+            throw new AccessDeniedException("Only admins can create users");
+        }
+
+        Task updatedTask = taskMapper.toTaskFromRequest(request);
+
+        return taskMapper.toTaskResponseFromModel(updatedTask);
     }
 }

@@ -21,6 +21,10 @@ app:
     secret: ${JWT_SECRET}
     access-token-expiration-ms: 900000
     refresh-token-expiration-ms: 604800000
+  admin:
+    username: ${ADMIN_USERNAME}
+    email: ${ADMIN_EMAIL}
+    password: ${ADMIN_PASSWORD}
 
 schedule:
   refresh-token-cleanup-schedule-time: "0 59 23 * * *"

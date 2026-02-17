@@ -1,12 +1,15 @@
 package com.katlego.task_tracking_api.exceptionHandler;
 
 import com.katlego.task_tracking_api.exception.ResourceAlreadyExistException;
+import com.katlego.task_tracking_api.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,6 +27,30 @@ public class GlobalExceptionHandler {
                 status.value(),
                 status,
                 LocalDateTime.now()
+        );
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException ex) {
+        return new ResponseEntity<>(
+                createErrorResponse(ex.getMessage(), HttpStatus.UNAUTHORIZED),
+                HttpStatus.UNAUTHORIZED
+        );
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException ex) {
+        return new ResponseEntity<>(
+                createErrorResponse(ex.getMessage(), HttpStatus.FORBIDDEN),
+                HttpStatus.FORBIDDEN
+        );
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        return new ResponseEntity<>(
+                createErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND),
+                HttpStatus.NOT_FOUND
         );
     }
 

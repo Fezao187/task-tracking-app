@@ -42,7 +42,7 @@ public class AdminSeeder implements CommandLineRunner {
     public void run(String... args) {
         log.info("Seeding admin user......");
         if (userRepository.findByEmail(email).isPresent()) {
-            log.error("Admin user already seeded, no need to seed.");
+            log.warn("Admin user already seeded, no need to seed.");
             return;
         }
 

@@ -4,14 +4,17 @@ import com.katlego.task_tracking_api.domain.Role;
 import com.katlego.task_tracking_api.domain.User;
 import com.katlego.task_tracking_api.dto.auth.AuthResponse;
 import com.katlego.task_tracking_api.dto.auth.LoginRequest;
+import com.katlego.task_tracking_api.dto.auth.RefreshTokenRequest;
 import com.katlego.task_tracking_api.dto.auth.SignupRequest;
 import com.katlego.task_tracking_api.exception.ResourceAlreadyExistException;
+import com.katlego.task_tracking_api.exception.ResourceNotFoundException;
 import com.katlego.task_tracking_api.mapper.AuthenticationMapper;
 import com.katlego.task_tracking_api.repository.RoleRepository;
 import com.katlego.task_tracking_api.repository.UserRepository;
 import com.katlego.task_tracking_api.security.entity.CustomUserDetails;
 import com.katlego.task_tracking_api.security.jwt.service.JwtService;
 import com.katlego.task_tracking_api.security.service.RefreshTokenService;
+import jakarta.transaction.Transactional;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -78,6 +81,40 @@ public class AuthService {
                 ));
 
         return generateTokens(user);
+    }
+
+    @Transactional
+    public AuthResponse refreshToken(RefreshTokenRequest request) {
+
+        String refreshToken = request.getRefreshToken();
+
+        String email = jwtService.extractUsername(refreshToken);
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+
+        if (!jwtService.validateRefreshToken(refreshToken, userDetails)) {
+            throw new IllegalStateException("Invalid refresh token");
+        }
+
+        // 3️⃣ Validate token exists in DB (prevents reuse attacks)
+        if (!refreshTokenService.isRefreshTokenValid(email, refreshToken)) {
+            throw new IllegalStateException("Refresh token not recognized");
+        }
+
+        Map<String, Object> claims = Map.of(
+                "username", user.getUsername(),
+                "role", user.getRole().getName()
+        );
+
+        String newAccessToken = jwtService.generateAccessToken(email, claims);
+        String newRefreshToken = jwtService.generateRefreshToken(email);
+
+        refreshTokenService.rotateRefreshToken(email, refreshToken, newRefreshToken);
+
+        return new AuthResponse(newAccessToken, newRefreshToken);
     }
 
     private AuthResponse generateTokens(User user) {

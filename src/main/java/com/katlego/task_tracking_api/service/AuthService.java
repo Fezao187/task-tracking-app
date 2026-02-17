@@ -62,7 +62,7 @@ public class AuthService {
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
 
-        return generateTokens(user);
+        return generateTokens(user, null);
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -80,7 +80,7 @@ public class AuthService {
                         "Authenticated user not found in database"
                 ));
 
-        return generateTokens(user);
+        return generateTokens(user, null);
     }
 
     @Transactional
@@ -99,39 +99,36 @@ public class AuthService {
             throw new IllegalStateException("Invalid refresh token");
         }
 
-        // 3️⃣ Validate token exists in DB (prevents reuse attacks)
         if (!refreshTokenService.isRefreshTokenValid(email, refreshToken)) {
             throw new IllegalStateException("Refresh token not recognized");
         }
 
-        Map<String, Object> claims = Map.of(
-                "username", user.getUsername(),
-                "role", user.getRole().getName()
-        );
-
-        String newAccessToken = jwtService.generateAccessToken(email, claims);
-        String newRefreshToken = jwtService.generateRefreshToken(email);
-
-        refreshTokenService.rotateRefreshToken(email, refreshToken, newRefreshToken);
-
-        return new AuthResponse(newAccessToken, newRefreshToken);
+        return generateTokens(user, refreshToken);
     }
 
-    private AuthResponse generateTokens(User user) {
-        if (user.getRole() == null) {
-            throw new IllegalStateException("User " + user.getEmail() + " has no role assigned");
+    private AuthResponse generateTokens(User user, String oldRefreshToken) {
+        Map<String, Object> claims = buildClaims(user);
+
+        String accessToken = jwtService.generateAccessToken(user.getEmail(), claims);
+        String refreshToken = jwtService.generateRefreshToken(user.getEmail());
+
+        if (oldRefreshToken == null) {
+            refreshTokenService.saveRefreshToken(user.getEmail(), refreshToken);
+        } else {
+            refreshTokenService.rotateRefreshToken(
+                    user.getEmail(),
+                    oldRefreshToken,
+                    refreshToken
+            );
         }
 
-        Map<String, Object> claims = Map.of(
+        return new AuthResponse(accessToken, refreshToken);
+    }
+
+    private Map<String, Object> buildClaims(User user) {
+        return Map.of(
                 "username", user.getUsername(),
                 "role", user.getRole().getName()
         );
-
-        String accessToken = jwtService.generateAccessToken(user.getEmail(), claims);
-
-        String refreshToken = jwtService.generateRefreshToken(user.getEmail());
-        refreshTokenService.saveRefreshToken(user.getEmail(), refreshToken);
-
-        return new AuthResponse(accessToken, refreshToken);
     }
 }

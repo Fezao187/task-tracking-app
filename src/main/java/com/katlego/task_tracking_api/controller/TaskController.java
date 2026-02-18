@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/task")
 public class TaskController {
@@ -29,10 +31,15 @@ public class TaskController {
         return new ResponseEntity<>(taskService.updateTask(taskId, request), HttpStatus.OK);
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<TaskResponse> getTaskById(@PathVariable Long id){
         return new ResponseEntity<>(taskService.getTaskById(id), HttpStatus.OK);
     }
-    //Todo: Add endpoint for getting task of assigned user
+
+    @GetMapping("/my-tasks")
+    public ResponseEntity<List<TaskResponse>> getAllMyAssignedTasks(){
+        return new ResponseEntity<>(taskService.getAllMyAssignedTasks(),HttpStatus.OK);
+    }
+
     //Todo: Add endpoint for getting all tasks
 }

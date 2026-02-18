@@ -2,6 +2,7 @@ package com.katlego.task_tracking_api.service;
 
 import com.katlego.task_tracking_api.common.AuthenticatedUserComponent;
 import com.katlego.task_tracking_api.domain.Task;
+import com.katlego.task_tracking_api.domain.User;
 import com.katlego.task_tracking_api.dto.task.TaskRequest;
 import com.katlego.task_tracking_api.dto.task.TaskResponse;
 import com.katlego.task_tracking_api.exception.ResourceNotFoundException;
@@ -9,6 +10,9 @@ import com.katlego.task_tracking_api.mapper.TaskMapper;
 import com.katlego.task_tracking_api.repository.TaskRepository;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskService {
@@ -55,5 +59,17 @@ public class TaskService {
                 .orElseThrow(() -> new ResourceNotFoundException("Task with id: " + taskId + ", not found."));
 
         return taskMapper.toTaskResponseFromModel(task);
+    }
+
+    public List<TaskResponse> getAllMyAssignedTasks(){
+        User user = authenticatedUserComponent.getCurrentLoggedInUser();
+
+        List<Task> myTasks = taskRepository.findTaskByAssignedUser(user.getId())
+                .orElseThrow(()->new ResourceNotFoundException("The logged in user currently has no tasks"));
+
+        return myTasks
+                .stream()
+                .map(taskMapper::toTaskResponseFromModel)
+                .collect(Collectors.toList());
     }
 }

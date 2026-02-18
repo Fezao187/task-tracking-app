@@ -31,9 +31,6 @@ public class UserService {
     }
 
     public AdminCreateUserResponse adminCreateUser(AdminCreateUserRequest request) {
-        if(!authenticatedUserComponent.isAdmin()){
-            throw new AccessDeniedException("Only admins can create users");
-        }
 
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new ResourceAlreadyExistException("Email already exists: " + request.getEmail());

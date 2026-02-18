@@ -38,9 +38,6 @@ public class TaskService {
     }
 
     public TaskResponse createTask(TaskRequest request) {
-        if (!authenticatedUserComponent.isAdmin()) {
-            throw new AccessDeniedException("Only admins can create tasks");
-        }
 
         Task newTask = taskMapper.toTaskFromRequest(request);
 
@@ -48,9 +45,6 @@ public class TaskService {
     }
 
     public TaskResponse updateTask(Long taskId, TaskRequest request) {
-        if (!authenticatedUserComponent.isAdmin()) {
-            throw new AccessDeniedException("Only admins can update tasks");
-        }
         Task updateTask = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task with id: " + taskId + ", not found."));
 
@@ -83,10 +77,6 @@ public class TaskService {
     }
 
     public List<TaskResponse> getAllTasks(){
-        if (!authenticatedUserComponent.isAdmin()) {
-            throw new AccessDeniedException("Only admins can see all tasks");
-        }
-
         List<Task> allTasks = taskRepository.findAll();
 
         if (allTasks.isEmpty()){
@@ -100,9 +90,6 @@ public class TaskService {
     }
 
     public TaskDeleteResponse deleteTaskById(Long taskId){
-        if (!authenticatedUserComponent.isAdmin()) {
-            throw new AccessDeniedException("Only admins can delete tasks tasks");
-        }
 
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task with id: " + taskId + ", not found."));
@@ -113,9 +100,6 @@ public class TaskService {
     }
 
     public TaskResponse assignTask(Long taskId, TaskAssignRequest request) {
-        if (!authenticatedUserComponent.isAdmin()) {
-            throw new AccessDeniedException("Only admins can assign tasks");
-        }
 
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task with id: " + taskId + ", not found."));
@@ -129,9 +113,6 @@ public class TaskService {
     }
 
     public Page<TaskResponse> getTasks(TaskFilter filter, Pageable pageable) {
-        if (!authenticatedUserComponent.isAdmin()) {
-            throw new AccessDeniedException("Only admins can view filtered tasks");
-        }
 
         Specification<Task> spec = Specification.where((root, query, cb) -> cb.conjunction());
 

@@ -15,7 +15,6 @@ import com.katlego.task_tracking_api.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,14 +22,12 @@ import java.util.stream.Collectors;
 
 @Service
 public class TaskService {
-    private final AuthService authService;
     private final TaskRepository taskRepository;
     private final AuthenticatedUserComponent authenticatedUserComponent;
     private final TaskMapper taskMapper;
     private final UserRepository userRepository;
 
-    public TaskService(AuthService authService, TaskRepository taskRepository, AuthenticatedUserComponent authenticatedUserComponent, TaskMapper taskMapper, UserRepository userRepository) {
-        this.authService = authService;
+    public TaskService(TaskRepository taskRepository, AuthenticatedUserComponent authenticatedUserComponent, TaskMapper taskMapper, UserRepository userRepository) {
         this.taskRepository = taskRepository;
         this.authenticatedUserComponent = authenticatedUserComponent;
         this.taskMapper = taskMapper;
@@ -67,23 +64,14 @@ public class TaskService {
     public List<TaskResponse> getAllMyAssignedTasks(){
         User user = authenticatedUserComponent.getCurrentLoggedInUser();
 
-        List<Task> myTasks = taskRepository.findTaskByAssignedUser(user.getId())
-                .orElseThrow(()->new ResourceNotFoundException("The logged in user currently has no tasks"));
-
-        return myTasks
+        return taskRepository.findTaskByAssignedUser(user.getId())
                 .stream()
                 .map(taskMapper::toTaskResponseFromModel)
                 .collect(Collectors.toList());
     }
 
     public List<TaskResponse> getAllTasks(){
-        List<Task> allTasks = taskRepository.findAll();
-
-        if (allTasks.isEmpty()){
-            throw new ResourceNotFoundException("There are no tasks created.");
-        }
-
-        return allTasks
+        return taskRepository.findAll()
                 .stream()
                 .map(taskMapper::toTaskResponseFromModel)
                 .collect(Collectors.toList());

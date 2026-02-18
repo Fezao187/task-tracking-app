@@ -8,5 +8,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificationExecutor<Task> {
-    Optional<List<Task>> findTaskByAssignedUser(Long assignedUserId);
+   List<Task> findTaskByAssignedUser(Long assignedUserId);
 }

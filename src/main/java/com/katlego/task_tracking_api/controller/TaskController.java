@@ -28,4 +28,11 @@ public class TaskController {
     public ResponseEntity<TaskResponse> updateTask(@RequestBody TaskRequest request, @RequestParam Long taskId){
         return new ResponseEntity<>(taskService.updateTask(taskId, request), HttpStatus.OK);
     }
+
+    @GetMapping("{id}")
+    public ResponseEntity<TaskResponse> getTaskById(@PathVariable Long id){
+        return new ResponseEntity<>(taskService.getTaskById(id), HttpStatus.OK);
+    }
+    //Todo: Add endpoint for getting task of assigned user
+    //Todo: Add endpoint for getting all tasks
 }

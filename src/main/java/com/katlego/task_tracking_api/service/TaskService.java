@@ -4,6 +4,7 @@ import com.katlego.task_tracking_api.common.AuthenticatedUserComponent;
 import com.katlego.task_tracking_api.domain.Task;
 import com.katlego.task_tracking_api.dto.task.TaskRequest;
 import com.katlego.task_tracking_api.dto.task.TaskResponse;
+import com.katlego.task_tracking_api.exception.ResourceNotFoundException;
 import com.katlego.task_tracking_api.mapper.TaskMapper;
 import com.katlego.task_tracking_api.repository.TaskRepository;
 import org.springframework.security.access.AccessDeniedException;
@@ -23,23 +24,36 @@ public class TaskService {
         this.taskMapper = taskMapper;
     }
 
-    public TaskResponse createTask(TaskRequest request){
-        if(!authenticatedUserComponent.isAdmin()){
+    public TaskResponse createTask(TaskRequest request) {
+        if (!authenticatedUserComponent.isAdmin()) {
             throw new AccessDeniedException("Only admins can create users");
         }
 
         Task newTask = taskMapper.toTaskFromRequest(request);
 
-        return taskMapper.toTaskResponseFromModel(newTask);
+        return taskMapper.toTaskResponseFromModel(taskRepository.save(newTask));
     }
 
-    public TaskResponse updateTask(Long taskId, TaskRequest request){
-        if(!authenticatedUserComponent.isAdmin()){
+    public TaskResponse updateTask(Long taskId, TaskRequest request) {
+        if (!authenticatedUserComponent.isAdmin()) {
             throw new AccessDeniedException("Only admins can create users");
         }
+        Task updateTask = taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task with id: " + taskId + ", not found."));
 
-        Task updatedTask = taskMapper.toTaskFromRequest(request);
+        updateTask.setTitle(request.getTitle());
+        updateTask.setStatus(request.getStatus());
+        updateTask.setDescription(request.getDescription());
+        updateTask.setDueDate(request.getDueDate());
 
-        return taskMapper.toTaskResponseFromModel(updatedTask);
+        return taskMapper.toTaskResponseFromModel(taskRepository.save(updateTask));
+    }
+
+    public TaskResponse getTaskById(Long taskId) {
+
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task with id: " + taskId + ", not found."));
+
+        return taskMapper.toTaskResponseFromModel(task);
     }
 }

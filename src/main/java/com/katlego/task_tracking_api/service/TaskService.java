@@ -3,6 +3,7 @@ package com.katlego.task_tracking_api.service;
 import com.katlego.task_tracking_api.common.AuthenticatedUserComponent;
 import com.katlego.task_tracking_api.domain.Task;
 import com.katlego.task_tracking_api.domain.User;
+import com.katlego.task_tracking_api.dto.task.TaskDeleteResponse;
 import com.katlego.task_tracking_api.dto.task.TaskRequest;
 import com.katlego.task_tracking_api.dto.task.TaskResponse;
 import com.katlego.task_tracking_api.exception.ResourceNotFoundException;
@@ -90,13 +91,16 @@ public class TaskService {
                 .collect(Collectors.toList());
     }
 
-    public String deleteTaskById(Long taskId){
+    public TaskDeleteResponse deleteTaskById(Long taskId){
         if (!authenticatedUserComponent.isAdmin()) {
             throw new AccessDeniedException("Only admins can delete tasks tasks");
         }
 
-        taskRepository.deleteById(taskId);
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task with id: " + taskId + ", not found."));
 
-        return "Successfully deleted!";
+        taskRepository.delete(task);
+
+        return new TaskDeleteResponse("Task successfully deleted");
     }
 }

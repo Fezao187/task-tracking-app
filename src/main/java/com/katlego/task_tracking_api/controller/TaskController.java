@@ -1,5 +1,6 @@
 package com.katlego.task_tracking_api.controller;
 
+import com.katlego.task_tracking_api.dto.task.TaskDeleteResponse;
 import com.katlego.task_tracking_api.dto.task.TaskRequest;
 import com.katlego.task_tracking_api.dto.task.TaskResponse;
 import com.katlego.task_tracking_api.service.TaskService;
@@ -49,7 +50,7 @@ public class TaskController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("{id}")
-    public ResponseEntity<String> deleteTask(@PathVariable Long id){
+    public ResponseEntity<TaskDeleteResponse> deleteTask(@PathVariable Long id){
         return new ResponseEntity<>(taskService.deleteTaskById(id), HttpStatus.OK);
     }
 }

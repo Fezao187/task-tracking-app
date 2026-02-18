@@ -1,15 +1,21 @@
 package com.katlego.task_tracking_api.controller;
 
+import com.katlego.task_tracking_api.domain.TaskStatus;
 import com.katlego.task_tracking_api.dto.task.TaskAssignRequest;
 import com.katlego.task_tracking_api.dto.task.TaskDeleteResponse;
+import com.katlego.task_tracking_api.dto.task.TaskFilter;
 import com.katlego.task_tracking_api.dto.task.TaskRequest;
 import com.katlego.task_tracking_api.dto.task.TaskResponse;
 import com.katlego.task_tracking_api.service.TaskService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.List;
 
 @RestController
@@ -31,6 +37,24 @@ public class TaskController {
     @PutMapping("/update")
     public ResponseEntity<TaskResponse> updateTask(@RequestBody TaskRequest request, @RequestParam Long taskId){
         return new ResponseEntity<>(taskService.updateTask(taskId, request), HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/search")
+    public ResponseEntity<Page<TaskResponse>> getTasks(
+            @RequestParam(required = false) TaskStatus status,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant dueDateFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant dueDateTo,
+            @RequestParam(required = false) Long assignedUserId,
+            Pageable pageable
+    ){
+        TaskFilter filter = new TaskFilter();
+        filter.setStatus(status);
+        filter.setDueDateFrom(dueDateFrom);
+        filter.setDueDateTo(dueDateTo);
+        filter.setAssignedUserId(assignedUserId);
+
+        return new ResponseEntity<>(taskService.getTasks(filter, pageable), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

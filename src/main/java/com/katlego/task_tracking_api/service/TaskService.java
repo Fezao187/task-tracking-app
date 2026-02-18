@@ -5,12 +5,16 @@ import com.katlego.task_tracking_api.domain.Task;
 import com.katlego.task_tracking_api.domain.User;
 import com.katlego.task_tracking_api.dto.task.TaskAssignRequest;
 import com.katlego.task_tracking_api.dto.task.TaskDeleteResponse;
+import com.katlego.task_tracking_api.dto.task.TaskFilter;
 import com.katlego.task_tracking_api.dto.task.TaskRequest;
 import com.katlego.task_tracking_api.dto.task.TaskResponse;
 import com.katlego.task_tracking_api.exception.ResourceNotFoundException;
 import com.katlego.task_tracking_api.mapper.TaskMapper;
 import com.katlego.task_tracking_api.repository.TaskRepository;
 import com.katlego.task_tracking_api.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -122,5 +126,33 @@ public class TaskService {
         task.setAssignedUser(assignedUser);
 
         return taskMapper.toTaskResponseFromModel(taskRepository.save(task));
+    }
+
+    public Page<TaskResponse> getTasks(TaskFilter filter, Pageable pageable) {
+        if (!authenticatedUserComponent.isAdmin()) {
+            throw new AccessDeniedException("Only admins can view filtered tasks");
+        }
+
+        Specification<Task> spec = Specification.where((root, query, cb) -> cb.conjunction());
+
+        if (filter.getStatus() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), filter.getStatus()));
+        }
+
+        if (filter.getDueDateFrom() != null) {
+            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("dueDate"), filter.getDueDateFrom()));
+        }
+
+        if (filter.getDueDateTo() != null) {
+            spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("dueDate"), filter.getDueDateTo()));
+        }
+
+        if (filter.getAssignedUserId() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.join("assignedUser").get("id"), filter.getAssignedUserId()));
+        }
+
+        Page<Task> page = taskRepository.findAll(spec, pageable);
+
+        return page.map(taskMapper::toTaskResponseFromModel);
     }
 }

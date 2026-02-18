@@ -3,12 +3,14 @@ package com.katlego.task_tracking_api.service;
 import com.katlego.task_tracking_api.common.AuthenticatedUserComponent;
 import com.katlego.task_tracking_api.domain.Task;
 import com.katlego.task_tracking_api.domain.User;
+import com.katlego.task_tracking_api.dto.task.TaskAssignRequest;
 import com.katlego.task_tracking_api.dto.task.TaskDeleteResponse;
 import com.katlego.task_tracking_api.dto.task.TaskRequest;
 import com.katlego.task_tracking_api.dto.task.TaskResponse;
 import com.katlego.task_tracking_api.exception.ResourceNotFoundException;
 import com.katlego.task_tracking_api.mapper.TaskMapper;
 import com.katlego.task_tracking_api.repository.TaskRepository;
+import com.katlego.task_tracking_api.repository.UserRepository;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -21,12 +23,14 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final AuthenticatedUserComponent authenticatedUserComponent;
     private final TaskMapper taskMapper;
+    private final UserRepository userRepository;
 
-    public TaskService(AuthService authService, TaskRepository taskRepository, AuthenticatedUserComponent authenticatedUserComponent, TaskMapper taskMapper) {
+    public TaskService(AuthService authService, TaskRepository taskRepository, AuthenticatedUserComponent authenticatedUserComponent, TaskMapper taskMapper, UserRepository userRepository) {
         this.authService = authService;
         this.taskRepository = taskRepository;
         this.authenticatedUserComponent = authenticatedUserComponent;
         this.taskMapper = taskMapper;
+        this.userRepository = userRepository;
     }
 
     public TaskResponse createTask(TaskRequest request) {
@@ -102,5 +106,21 @@ public class TaskService {
         taskRepository.delete(task);
 
         return new TaskDeleteResponse("Task successfully deleted");
+    }
+
+    public TaskResponse assignTask(Long taskId, TaskAssignRequest request) {
+        if (!authenticatedUserComponent.isAdmin()) {
+            throw new AccessDeniedException("Only admins can assign tasks");
+        }
+
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task with id: " + taskId + ", not found."));
+
+        User assignedUser = userRepository.findById(request.getAssignedUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User with id: " + request.getAssignedUserId() + ", not found."));
+
+        task.setAssignedUser(assignedUser);
+
+        return taskMapper.toTaskResponseFromModel(taskRepository.save(task));
     }
 }

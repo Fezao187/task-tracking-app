@@ -1,5 +1,6 @@
 package com.katlego.task_tracking_api.controller;
 
+import com.katlego.task_tracking_api.dto.task.TaskAssignRequest;
 import com.katlego.task_tracking_api.dto.task.TaskDeleteResponse;
 import com.katlego.task_tracking_api.dto.task.TaskRequest;
 import com.katlego.task_tracking_api.dto.task.TaskResponse;
@@ -30,6 +31,12 @@ public class TaskController {
     @PutMapping("/update")
     public ResponseEntity<TaskResponse> updateTask(@RequestBody TaskRequest request, @RequestParam Long taskId){
         return new ResponseEntity<>(taskService.updateTask(taskId, request), HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{id}/assign")
+    public ResponseEntity<TaskResponse> assignTask(@PathVariable Long id, @RequestBody TaskAssignRequest request){
+        return new ResponseEntity<>(taskService.assignTask(id, request), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

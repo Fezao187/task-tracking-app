@@ -89,4 +89,14 @@ public class TaskService {
                 .map(taskMapper::toTaskResponseFromModel)
                 .collect(Collectors.toList());
     }
+
+    public String deleteTaskById(Long taskId){
+        if (!authenticatedUserComponent.isAdmin()) {
+            throw new AccessDeniedException("Only admins can delete tasks tasks");
+        }
+
+        taskRepository.deleteById(taskId);
+
+        return "Successfully deleted!";
+    }
 }

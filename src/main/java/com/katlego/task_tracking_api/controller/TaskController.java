@@ -47,5 +47,9 @@ public class TaskController {
         return new ResponseEntity<>(taskService.getAllTasks(),HttpStatus.OK);
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("{id}")
+    public ResponseEntity<String> deleteTask(@PathVariable Long id){
+        return new ResponseEntity<>(taskService.deleteTaskById(id), HttpStatus.OK);
+    }
 }

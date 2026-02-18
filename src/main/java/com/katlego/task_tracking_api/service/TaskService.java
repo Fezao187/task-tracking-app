@@ -30,7 +30,7 @@ public class TaskService {
 
     public TaskResponse createTask(TaskRequest request) {
         if (!authenticatedUserComponent.isAdmin()) {
-            throw new AccessDeniedException("Only admins can create users");
+            throw new AccessDeniedException("Only admins can create tasks");
         }
 
         Task newTask = taskMapper.toTaskFromRequest(request);
@@ -40,7 +40,7 @@ public class TaskService {
 
     public TaskResponse updateTask(Long taskId, TaskRequest request) {
         if (!authenticatedUserComponent.isAdmin()) {
-            throw new AccessDeniedException("Only admins can create users");
+            throw new AccessDeniedException("Only admins can update tasks");
         }
         Task updateTask = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task with id: " + taskId + ", not found."));
@@ -68,6 +68,23 @@ public class TaskService {
                 .orElseThrow(()->new ResourceNotFoundException("The logged in user currently has no tasks"));
 
         return myTasks
+                .stream()
+                .map(taskMapper::toTaskResponseFromModel)
+                .collect(Collectors.toList());
+    }
+
+    public List<TaskResponse> getAllTasks(){
+        if (!authenticatedUserComponent.isAdmin()) {
+            throw new AccessDeniedException("Only admins can see all tasks");
+        }
+
+        List<Task> allTasks = taskRepository.findAll();
+
+        if (allTasks.isEmpty()){
+            throw new ResourceNotFoundException("There are no tasks created.");
+        }
+
+        return allTasks
                 .stream()
                 .map(taskMapper::toTaskResponseFromModel)
                 .collect(Collectors.toList());

@@ -41,5 +41,11 @@ public class TaskController {
         return new ResponseEntity<>(taskService.getAllMyAssignedTasks(),HttpStatus.OK);
     }
 
-    //Todo: Add endpoint for getting all tasks
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/all")
+    public ResponseEntity<List<TaskResponse>> getAllTasks(){
+        return new ResponseEntity<>(taskService.getAllTasks(),HttpStatus.OK);
+    }
+
+
 }

@@ -29,4 +29,4 @@ app:
 
 schedule:
   refresh-token-cleanup-schedule-time: "0 59 23 * * *"
-  overdue-task-schedule-time: "0 49 14 * * *"
+  overdue-task-schedule-time: "0 0 * * * *"

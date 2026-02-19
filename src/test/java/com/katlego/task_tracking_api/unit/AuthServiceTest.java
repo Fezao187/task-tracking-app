@@ -35,6 +35,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Authentication service tests")
 class AuthServiceTest {
 
     @Mock private UserRepository userRepository;
@@ -220,7 +221,6 @@ class AuthServiceTest {
     @DisplayName("Successfully generating refresh token")
     void refreshToken_success() {
         RefreshTokenRequest request = new RefreshTokenRequest("old_refresh_token");
-        CustomUserDetails userDetails = new CustomUserDetails(user);
 
         when(jwtService.extractUsername("old_refresh_token")).thenReturn(user.getEmail());
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));

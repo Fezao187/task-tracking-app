@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
+//Todo: Refactor to seed using data initialiser.
 public class AdminSeeder implements CommandLineRunner {
     private final String username;
     private final String email;

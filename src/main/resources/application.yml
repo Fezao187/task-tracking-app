@@ -8,10 +8,15 @@ spring:
     password: ${POSTGRES_PASSWORD}
     url: ${SPRING_DATASOURCE_URL}
   jpa:
+    hibernate:
+      ddl-auto: validate
     show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  sql:
+    init:
+      mode: always
   flyway:
     baseline-on-migrate: true
     validate-on-migrate: true
@@ -21,11 +26,7 @@ app:
     secret: ${JWT_SECRET}
     access-token-expiration-ms: 900000
     refresh-token-expiration-ms: 604800000
-  admin:
-    username: ${ADMIN_USERNAME}
-    email: ${ADMIN_EMAIL}
-    password: ${ADMIN_PASSWORD}
 
 schedule:
   refresh-token-cleanup-schedule-time: "0 59 23 * * *"
-  overdue-task-schedule-time: "0 0 * * * *"
+  overdue-task-schedule-time: "0 49 14 * * *"

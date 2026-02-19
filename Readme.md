@@ -149,7 +149,7 @@ Given more time, the following improvements would be prioritized:
   - Add unit and end-to-end tests.
 
 - **Testing**  
-  - Add integration and Acceptance tests using Testcontainers with PostgreSQL to validate migrations, JPA mappings, and security end-to-end.
+  - Add integration and Acceptance(cucumber) tests using Testcontainers with PostgreSQL to validate migrations, JPA mappings, and security end-to-end.
 
 - **CI/CD**  
   - Add a GitHub Actions pipeline for deploying and testing (intergration, end-2-end, acceptance) PR.

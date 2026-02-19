@@ -34,9 +34,9 @@ public class TaskController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/update")
-    public ResponseEntity<TaskResponse> updateTask(@RequestBody TaskRequest request, @RequestParam Long taskId){
-        return new ResponseEntity<>(taskService.updateTask(taskId, request), HttpStatus.OK);
+    @PutMapping("/update/{id}")
+    public ResponseEntity<TaskResponse> updateTask(@RequestBody TaskRequest request, @PathVariable Long id){
+        return new ResponseEntity<>(taskService.updateTask(id, request), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
